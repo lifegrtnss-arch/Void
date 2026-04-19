@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VOIDCAST</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --black:#000;
+  --bg:#080808;
+  --card:#0e0e0e;
+  --card2:#141414;
+  --line:#1c1c1c;
+  --line2:#282828;
+  --dim:#3a3a3a;
+  --muted:#666;
+  --soft:#aaa;
+  --text:#ececec;
+  --white:#fff;
+  --red:#c8102e;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:400;min-height:100vh}
+::selection{background:var(--red);color:#fff}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--dim);border-radius:2px}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:58px;background:rgba(8,8,8,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(20px)}
+.logo{font-family:'DM Serif Display',serif;font-size:22px;letter-spacing:-.5px;color:var(--white);user-select:none}
+.logo em{color:var(--red);font-style:normal}
+.nav-right{display:flex;align-items:center;gap:14px}
+.admin-dot{width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.add-btn{display:flex;align-items:center;gap:8px;background:var(--white);color:var(--black);border:none;border-radius:4px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;padding:8px 18px;cursor:pointer;transition:all .2s;letter-spacing:.2px}
+.add-btn:hover{background:var(--red);color:#fff;transform:translateY(-1px)}
+
+/* HERO */
+.hero{padding:120px 40px 48px;max-width:900px}
+.hero-label{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--red);font-weight:600;margin-bottom:16px}
+.hero-title{font-family:'DM Serif Display',serif;font-size:clamp(36px,5vw,64px);line-height:1.05;color:var(--white);margin-bottom:16px}
+.hero-title em{color:var(--muted);font-style:italic}
+.hero-sub{font-size:15px;color:var(--muted);line-height:1.7;max-width:460px}
+
+/* SECTION */
+.section{padding:0 40px 60px}
+.section-head{display:flex;align-items:baseline;gap:14px;margin-bottom:28px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.section-title{font-family:'DM Serif Display',serif;font-size:22px;color:var(--white)}
+.section-count{font-size:13px;color:var(--dim)}
+
+/* GRID */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:2px}
+
+/* VIDEO CARD */
+.vcard{background:var(--card);border:1px solid var(--line);cursor:pointer;transition:border-color .2s,background .2s;position:relative;overflow:hidden}
+.vcard:hover{background:var(--card2);border-color:var(--line2)}
+.vcard:hover .vthumb-overlay{opacity:1}
+.vcard:hover .vplay{transform:scale(1.1)}
+.vthumb{width:100%;aspect-ratio:16/9;background:#000;position:relative;overflow:hidden}
+.vthumb-img{width:100%;height:100%;object-fit:cover;filter:brightness(.8);transition:filter .3s,transform .4s}
+.vcard:hover .vthumb-img{filter:brightness(.6);transform:scale(1.03)}
+.vthumb-overlay{position:absolute;inset:0;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .25s}
+.vplay{width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.95);display:flex;align-items:center;justify-content:center;transition:transform .2s;box-shadow:0 4px 20px rgba(0,0,0,.5)}
+.vplay svg{margin-left:4px}
+.vthumb-no{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#000}
+.vthumb-no span{font-size:11px;color:var(--dim);letter-spacing:1px;text-transform:uppercase}
+.vcategory{position:absolute;top:12px;left:12px;background:var(--red);color:#fff;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 8px;border-radius:2px}
+.vduration{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,.82);color:#fff;font-size:11px;font-weight:600;padding:2px 7px;border-radius:3px;letter-spacing:.3px}
+.vbody{padding:16px 18px 18px}
+.vtitle{font-size:15px;font-weight:600;color:var(--white);line-height:1.4;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.vdesc{font-size:13px;color:var(--muted);line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:12px}
+.vmeta{display:flex;align-items:center;gap:10px}
+.vmeta-time{font-size:12px;color:var(--dim)}
+.vmeta-dot{width:3px;height:3px;border-radius:50%;background:var(--dim)}
+.vmeta-cat{font-size:12px;color:var(--dim)}
+
+/* FEATURED */
+.featured{grid-column:1/-1;display:grid;grid-template-columns:1.3fr 1fr}
+@media(max-width:700px){.featured{grid-template-columns:1fr}}
+.featured .vthumb{aspect-ratio:unset;min-height:320px}
+.featured .vplay{width:72px;height:72px}
+.featured .vbody{padding:32px 30px;display:flex;flex-direction:column;justify-content:center}
+.featured .vtitle{font-family:'DM Serif Display',serif;font-size:26px;margin-bottom:12px;-webkit-line-clamp:3;line-height:1.25}
+.featured .vdesc{-webkit-line-clamp:4;margin-bottom:20px;font-size:14px}
+.featured-badge{display:inline-block;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--red);font-weight:700;margin-bottom:14px;border:1px solid var(--red);padding:3px 10px;border-radius:2px}
+
+/* DELETE BTN */
+.del-btn{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.75);border:1px solid var(--line2);color:var(--muted);border-radius:3px;font-size:11px;padding:4px 9px;cursor:pointer;opacity:0;transition:.15s;z-index:10;font-family:'DM Sans',sans-serif}
+.vcard:hover .del-btn{opacity:1}
+.del-btn:hover{background:var(--red);border-color:var(--red);color:#fff}
+
+/* EMPTY */
+.empty{grid-column:1/-1;padding:80px 20px;text-align:center}
+.empty-big{font-family:'DM Serif Display',serif;font-size:32px;color:var(--dim);margin-bottom:12px}
+.empty-sub{font-size:14px;color:var(--muted)}
+
+/* WATCH MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:500;align-items:center;justify-content:center;padding:16px}
+.modal-bg.open{display:flex}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+.watch-modal{background:#000;border:1px solid var(--line2);border-radius:8px;width:100%;max-width:900px;max-height:95vh;overflow:hidden;display:flex;flex-direction:column;animation:fadeUp .28s ease}
+.watch-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:var(--card);border-bottom:1px solid var(--line);flex-shrink:0}
+.watch-bar-left{display:flex;align-items:center;gap:10px}
+.watch-cat-badge{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;background:var(--red);color:#fff;padding:3px 8px;border-radius:2px}
+.watch-bar-title{font-size:13px;color:var(--soft);font-weight:500}
+.modal-close{background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:.15s;line-height:1;flex-shrink:0}
+.modal-close:hover{background:var(--line2);color:var(--white)}
+
+/* Full native player area */
+.watch-player{width:100%;aspect-ratio:16/9;background:#000;position:relative;flex-shrink:0}
+.watch-player iframe{position:absolute;inset:0;width:100%;height:100%;border:none}
+
+.watch-info{padding:20px 24px 24px;background:var(--card);overflow-y:auto}
+.watch-title{font-family:'DM Serif Display',serif;font-size:22px;color:var(--white);line-height:1.3;margin-bottom:8px}
+.watch-meta-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.watch-meta-item{font-size:13px;color:var(--dim)}
+.watch-meta-dot{width:3px;height:3px;border-radius:50%;background:var(--dim)}
+.watch-desc{font-size:14px;color:var(--muted);line-height:1.75}
+
+/* PASSWORD MODAL */
+.pw-wrap{background:var(--card);border:1px solid var(--line2);border-radius:8px;width:100%;max-width:340px;padding:38px 30px;animation:fadeUp .25s ease;text-align:center}
+.pw-icon{font-size:32px;margin-bottom:16px;opacity:.6}
+.pw-title{font-family:'DM Serif Display',serif;font-size:22px;color:var(--white);margin-bottom:6px}
+.pw-sub{font-size:13px;color:var(--muted);margin-bottom:28px;line-height:1.5}
+.pw-input{width:100%;background:var(--bg);border:1px solid var(--line2);border-radius:4px;color:var(--white);font-family:'DM Sans',sans-serif;font-size:22px;font-weight:600;letter-spacing:8px;padding:14px;outline:none;transition:border-color .2s;text-align:center;margin-bottom:10px}
+.pw-input:focus{border-color:#444}
+.pw-input::placeholder{letter-spacing:0;font-size:13px;font-weight:400;color:var(--muted)}
+.pw-error{font-size:12px;color:var(--red);min-height:18px;margin-bottom:14px;transition:.2s}
+.pw-btn{width:100%;background:var(--white);color:var(--black);border:none;border-radius:4px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;padding:13px;cursor:pointer;transition:.2s}
+.pw-btn:hover{background:var(--red);color:#fff}
+
+/* POST DRAWER */
+.drawer-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:500;align-items:flex-start;justify-content:center;padding:70px 16px 30px;overflow-y:auto}
+.drawer-bg.open{display:flex}
+.drawer{background:var(--card);border:1px solid var(--line2);border-radius:8px;width:100%;max-width:520px;animation:fadeUp .25s ease}
+.drawer-bar{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--line)}
+.drawer-bar-title{font-family:'DM Serif Display',serif;font-size:18px;color:var(--white)}
+.drawer-body{padding:24px 22px}
+.field{margin-bottom:18px}
+.field label{display:block;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);margin-bottom:8px}
+.field input,.field textarea,.field select{width:100%;background:var(--bg);border:1px solid var(--line2);border-radius:4px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:11px 14px;outline:none;transition:border-color .2s;-webkit-appearance:none}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:#444}
+.field input::placeholder,.field textarea::placeholder{color:var(--muted)}
+textarea.field-ta{resize:vertical;min-height:80px;max-height:150px}
+.field select option{background:var(--card)}
+.url-prev{margin-top:10px;border-radius:4px;overflow:hidden;border:1px solid var(--line2);display:none}
+.url-prev.show{display:block}
+.url-prev iframe{width:100%;aspect-ratio:16/9;border:none;display:block}
+.url-prev-label{padding:6px 12px;font-size:11px;color:var(--dim);background:var(--bg);border-bottom:1px solid var(--line)}
+.drawer-foot{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-top:1px solid var(--line)}
+.cancel-btn{background:none;border:none;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;padding:8px;border-radius:4px;transition:.15s}
+.cancel-btn:hover{color:var(--text)}
+.post-submit{background:var(--white);color:var(--black);border:none;border-radius:4px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;padding:10px 28px;cursor:pointer;transition:.2s}
+.post-submit:hover{background:var(--red);color:#fff}
+.post-submit:disabled{opacity:.35;cursor:not-allowed}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--white);color:var(--black);font-size:13px;font-weight:600;padding:11px 24px;border-radius:4px;z-index:999;opacity:0;transition:all .3s;white-space:nowrap;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* FOOTER */
+footer{border-top:1px solid var(--line);padding:18px 40px;display:flex;align-items:center;justify-content:space-between}
+.foot-logo{font-family:'DM Serif Display',serif;font-size:15px;color:var(--dim)}
+.foot-logo em{color:var(--red);font-style:normal}
+.foot-credit{font-size:11px;color:var(--muted);letter-spacing:.2px}
+.foot-credit span{color:var(--soft)}
+
+/* RESPONSIVE */
+@media(max-width:640px){
+  nav{padding:0 18px}
+  .hero{padding:96px 18px 36px}
+  .section{padding:0 18px 48px}
+  .grid{grid-template-columns:1fr}
+  .featured{grid-template-columns:1fr}
+  .watch-info{padding:16px 18px 20px}
+  footer{padding:16px 18px;flex-direction:column;gap:6px;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<!-- ╔═══════════════════════════════════════════════════════╗
+     ║  BACKEND CONFIG                                       ║
+     ║  Replace the URL below with your Render backend URL. ║
+     ║                                                       ║
+     ║  Required API routes on your Node.js server:         ║
+     ║    GET    /videos       → returns JSON array         ║
+     ║    POST   /videos       → body:{title,desc,url,      ║
+     ║                            category,time}            ║
+     ║    DELETE /videos/:id   → deletes by id              ║
+     ╚═══════════════════════════════════════════════════════╝ -->
+<script>
+const BACKEND_URL = 'https://your-backend.onrender.com'; // ← PASTE YOUR RENDER URL HERE
+</script>
+<!-- ════════════════════════════════════════════════════════ -->
+
+<!-- NAV -->
+<nav>
+  <div class="logo">VOID<em>CAST</em></div>
+  <div class="nav-right">
+    <div class="admin-dot"></div>
+    <button class="add-btn" onclick="askPassword()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Post
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-label">Original Content</div>
+  <h1 class="hero-title">Watch what<br><em>matters.</em></h1>
+  <p class="hero-sub">Videos handpicked and posted by one creator. No algorithm. No noise.</p>
+</div>
+
+<!-- FEED -->
+<section class="section">
+  <div class="section-head">
+    <span class="section-title">Latest</span>
+    <span class="section-count" id="vidCount">—</span>
+  </div>
+  <div class="grid" id="grid">
+    <div class="empty">
+      <div class="empty-big" style="font-size:18px;color:var(--dim)">Loading…</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-logo">VOID<em>CAST</em></div>
+  <div class="foot-credit">Developed by <span>SAVIOUR CEASAR</span> — for connecting ideas</div>
+</footer>
+
+<!-- WATCH MODAL -->
+<div class="modal-bg" id="watchModal" onclick="bgClose(event,'watchModal')">
+  <div class="watch-modal">
+    <div class="watch-bar">
+      <div class="watch-bar-left">
+        <span class="watch-cat-badge" id="mCat">Video</span>
+        <span class="watch-bar-title" id="mBarTitle"></span>
+      </div>
+      <button class="modal-close" onclick="closeWatch()">✕</button>
+    </div>
+    <div class="watch-player">
+      <iframe id="mFrame"
+        allowfullscreen
+        allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+        referrerpolicy="strict-origin-when-cross-origin">
+      </iframe>
+    </div>
+    <div class="watch-info">
+      <div class="watch-title" id="mTitle"></div>
+      <div class="watch-meta-row">
+        <span class="watch-meta-item" id="mTime"></span>
+        <span class="watch-meta-dot" id="mDot" style="display:none"></span>
+        <span class="watch-meta-item" id="mCat2"></span>
+      </div>
+      <div class="watch-desc" id="mDesc"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PASSWORD MODAL -->
+<div class="modal-bg" id="pwModal" onclick="bgClose(event,'pwModal')">
+  <div class="pw-wrap">
+    <div class="pw-icon">🔐</div>
+    <div class="pw-title">Admin Access</div>
+    <div class="pw-sub">Enter your password to post a video</div>
+    <input class="pw-input" id="pwInput" type="password" placeholder="password"
+      onkeydown="if(event.key==='Enter')checkPassword()"/>
+    <div class="pw-error" id="pwError"></div>
+    <button class="pw-btn" onclick="checkPassword()">Unlock</button>
+  </div>
+</div>
+
+<!-- POST DRAWER -->
+<div class="drawer-bg" id="postDrawer" onclick="bgClose(event,'postDrawer')">
+  <div class="drawer">
+    <div class="drawer-bar">
+      <span class="drawer-bar-title">New Video</span>
+      <button class="modal-close" onclick="closeDrawer()">✕</button>
+    </div>
+    <div class="drawer-body">
+      <div class="field">
+        <label>Video URL</label>
+        <input id="fUrl" type="url" placeholder="https://youtube.com/watch?v=… or Vimeo" oninput="onUrlInput()"/>
+        <div class="url-prev" id="urlPrev">
+          <div class="url-prev-label">Preview</div>
+          <iframe id="prevFrame" allowfullscreen allow="autoplay;encrypted-media"></iframe>
+        </div>
+      </div>
+      <div class="field">
+        <label>Title</label>
+        <input id="fTitle" type="text" placeholder="Give it a strong title"/>
+      </div>
+      <div class="field">
+        <label>Description</label>
+        <textarea id="fDesc" class="field-ta" placeholder="What's this about?"></textarea>
+      </div>
+      <div class="field">
+        <label>Category</label>
+        <select id="fCat">
+          <option value="">— Pick one —</option>
+          <option>Tech</option><option>Music</option><option>Gaming</option>
+          <option>Education</option><option>Art</option><option>Comedy</option>
+          <option>Sports</option><option>Science</option><option>Lifestyle</option><option>News</option>
+        </select>
+      </div>
+    </div>
+    <div class="drawer-foot">
+      <button class="cancel-btn" onclick="closeDrawer()">Cancel</button>
+      <button class="post-submit" id="postBtn" onclick="submitPost()">Publish</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════
+   PASSWORD
+   — resets every time drawer is closed
+   ══════════════════════════════════════ */
+const ADMIN_PASSWORD = '2080217';
+let authenticated = false;  // resets to false whenever drawer closes
+
+function askPassword() {
+  // Always require password — never skip even if previously authenticated
+  authenticated = false;
+  document.getElementById('pwInput').value = '';
+  document.getElementById('pwError').textContent = '';
+  document.getElementById('pwModal').classList.add('open');
+  setTimeout(() => document.getElementById('pwInput').focus(), 120);
+}
+
+function checkPassword() {
+  const val = document.getElementById('pwInput').value;
+  if (val === ADMIN_PASSWORD) {
+    document.getElementById('pwModal').classList.remove('open');
+    document.getElementById('pwInput').value = '';
+    openDrawer();
+  } else {
+    document.getElementById('pwError').textContent = 'Incorrect password. Try again.';
+    document.getElementById('pwInput').value = '';
+    document.getElementById('pwInput').focus();
+    setTimeout(() => document.getElementById('pwError').textContent = '', 2200);
+  }
+}
+
+/* ══════════════════════════════════════
+   STATE — backend only, no localStorage
+   ══════════════════════════════════════ */
+let videos = [];
+
+/* ══════════════════════════════════════
+   BACKEND API
+   Node.js routes needed:
+     GET    /videos       → [{id,title,desc,url,category,time},…]
+     POST   /videos       → {title,desc,url,category,time} → saved obj
+     DELETE /videos/:id   → removes video
+   ══════════════════════════════════════ */
+async function api(path, opts = {}) {
+  const res = await fetch(BACKEND_URL + path, {
+    headers: { 'Content-Type': 'application/json' },
+    ...opts
+  });
+  if (!res.ok) throw new Error('API ' + res.status);
+  return res.json();
+}
+
+async function loadVideos() {
+  try {
+    const data = await api('/videos');
+    videos = Array.isArray(data) ? data : [];
+  } catch(e) {
+    console.error('Could not reach backend:', e);
+    videos = [];
+    toast('Could not connect to server.');
+  }
+  render();
+}
+
+async function saveVideo(video) {
+  return api('/videos', { method: 'POST', body: JSON.stringify(video) });
+}
+
+async function removeVideo(id) {
+  return api('/videos/' + id, { method: 'DELETE' });
+}
+
+/* ══════════════════════════════════════
+   HELPERS
+   ══════════════════════════════════════ */
+function embedUrl(url) {
+  if (!url) return '';
+  try {
+    const u = new URL(url);
+    if (u.hostname.includes('youtube.com') || u.hostname.includes('youtu.be')) {
+      const v = u.searchParams.get('v') || u.pathname.split('/').pop();
+      // enablejsapi=1 enables full JS control; rel=0 no related; modestbranding=1
+      return `https://www.youtube.com/embed/${v}?rel=0&modestbranding=1&enablejsapi=1`;
+    }
+    if (u.hostname.includes('vimeo.com')) {
+      const id = u.pathname.split('/').filter(Boolean).pop();
+      return `https://player.vimeo.com/video/${id}?title=0&byline=0&portrait=0`;
+    }
+  } catch(e) {}
+  return '';
+}
+
+function thumbUrl(url) {
+  try {
+    const u = new URL(url);
+    if (u.hostname.includes('youtube.com') || u.hostname.includes('youtu.be')) {
+      const v = u.searchParams.get('v') || u.pathname.split('/').pop();
+      return `https://img.youtube.com/vi/${v}/maxresdefault.jpg`;
+    }
+  } catch(e) {}
+  return '';
+}
+
+function esc(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ══════════════════════════════════════
+   RENDER
+   ══════════════════════════════════════ */
+function render() {
+  const g = document.getElementById('grid');
+  const count = videos.length;
+  document.getElementById('vidCount').textContent = count + ' video' + (count !== 1 ? 's' : '');
+
+  if (count === 0) {
+    g.innerHTML = `<div class="empty">
+      <div class="empty-big">Nothing here yet.</div>
+      <div class="empty-sub">Click Post to add your first video.</div>
+    </div>`;
+    return;
+  }
+
+  g.innerHTML = videos.map((v, i) => {
+    const thumb = thumbUrl(v.url);
+    const feat  = i === 0;
+    const thumbHtml = thumb
+      ? `<img class="vthumb-img" src="${esc(thumb)}" alt="" loading="lazy"
+             onerror="this.src='https://img.youtube.com/vi/default/hqdefault.jpg'">`
+      : `<div class="vthumb-no"><span>no preview</span></div>`;
+
+    return `
+    <div class="vcard${feat ? ' featured' : ''}" onclick="openWatch(${JSON.stringify(v.id)})">
+      <div class="vthumb">
+        ${thumbHtml}
+        <div class="vthumb-overlay">
+          <div class="vplay">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#000"><polygon points="5,3 19,12 5,21"/></svg>
+          </div>
+        </div>
+        ${v.category ? `<div class="vcategory">${esc(v.category)}</div>` : ''}
+        <button class="del-btn" onclick="deleteVideo(${JSON.stringify(v.id)},event)">Delete</button>
+      </div>
+      <div class="vbody">
+        ${feat ? `<div class="featured-badge">Featured</div>` : ''}
+        <div class="vtitle">${esc(v.title)}</div>
+        ${v.desc ? `<div class="vdesc">${esc(v.desc)}</div>` : ''}
+        <div class="vmeta">
+          <span class="vmeta-time">${esc(v.time)}</span>
+          ${v.category ? `<span class="vmeta-dot"></span><span class="vmeta-cat">${esc(v.category)}</span>` : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════
+   WATCH MODAL — full native player
+   ══════════════════════════════════════ */
+function openWatch(id) {
+  const v = videos.find(x => String(x.id) === String(id));
+  if (!v) return;
+  const embed = embedUrl(v.url);
+  // autoplay=1 so video starts immediately
+  const src = embed + (embed.includes('?') ? '&autoplay=1' : '?autoplay=1');
+  document.getElementById('mFrame').src = src;
+  document.getElementById('mTitle').textContent = v.title || '';
+  document.getElementById('mBarTitle').textContent = v.title || '';
+  document.getElementById('mDesc').textContent = v.desc || '';
+  document.getElementById('mTime').textContent = v.time || '';
+  const cat = v.category || '';
+  document.getElementById('mCat').textContent  = cat || 'Video';
+  document.getElementById('mCat2').textContent = cat;
+  document.getElementById('mDot').style.display = cat ? 'block' : 'none';
+  document.getElementById('watchModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeWatch() {
+  document.getElementById('watchModal').classList.remove('open');
+  document.getElementById('mFrame').src = '';
+  document.body.style.overflow = '';
+}
+
+/* ══════════════════════════════════════
+   DRAWER
+   ══════════════════════════════════════ */
+function openDrawer() {
+  document.getElementById('postDrawer').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDrawer() {
+  // Reset auth every time drawer is exited
+  authenticated = false;
+  document.getElementById('postDrawer').classList.remove('open');
+  document.body.style.overflow = '';
+  resetForm();
+}
+
+function onUrlInput() {
+  const url   = document.getElementById('fUrl').value.trim();
+  const embed = embedUrl(url);
+  const prev  = document.getElementById('urlPrev');
+  if (embed) {
+    document.getElementById('prevFrame').src = embed;
+    prev.classList.add('show');
+  } else {
+    prev.classList.remove('show');
+    document.getElementById('prevFrame').src = '';
+  }
+}
+
+async function submitPost() {
+  const url   = document.getElementById('fUrl').value.trim();
+  const title = document.getElementById('fTitle').value.trim();
+  const desc  = document.getElementById('fDesc').value.trim();
+  const cat   = document.getElementById('fCat').value;
+  if (!url)   { toast('Add a video URL'); return; }
+  if (!title) { toast('Add a title'); return; }
+
+  const btn = document.getElementById('postBtn');
+  btn.disabled = true; btn.textContent = 'Publishing…';
+
+  const timeStr = new Date().toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'});
+  const payload = { title, desc, url, category: cat, time: timeStr };
+
+  try {
+    const saved = await saveVideo(payload);
+    videos.unshift(saved || { ...payload, id: Date.now() });
+    render();
+    closeDrawer();
+    toast('Video published!');
+  } catch(e) {
+    toast('Failed to publish. Check backend.');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Publish';
+  }
+}
+
+async function deleteVideo(id, e) {
+  e.stopPropagation();
+  if (!confirm('Delete this video?')) return;
+  try {
+    await removeVideo(id);
+    videos = videos.filter(v => String(v.id) !== String(id));
+    render();
+    toast('Deleted.');
+  } catch(err) {
+    toast('Delete failed. Check backend.');
+  }
+}
+
+function resetForm() {
+  ['fUrl','fTitle','fDesc'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('fCat').value = '';
+  document.getElementById('urlPrev').classList.remove('show');
+  document.getElementById('prevFrame').src = '';
+}
+
+/* ══════════════════════════════════════
+   BACKGROUND CLICK CLOSE
+   ══════════════════════════════════════ */
+function bgClose(e, id) {
+  if (e.target.id !== id) return;
+  if (id === 'watchModal') closeWatch();
+  else if (id === 'pwModal') document.getElementById('pwModal').classList.remove('open');
+  else if (id === 'postDrawer') closeDrawer();
+}
+
+/* ══════════════════════════════════════
+   TOAST
+   ══════════════════════════════════════ */
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+/* ══════════════════════════════════════
+   KEYBOARD
+   ══════════════════════════════════════ */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeWatch();
+    closeDrawer();
+    document.getElementById('pwModal').classList.remove('open');
+  }
+});
+
+/* ══════════════════════════════════════
+   INIT
+   ══════════════════════════════════════ */
+loadVideos();
+</script>
+</body>
+  </html>
